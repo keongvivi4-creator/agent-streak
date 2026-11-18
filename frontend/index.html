@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Agent Streak — a free daily on-chain check-in for Agent ID holders. Build your streak, one day at a time.">
+  <title>Agent Streak — Daily On-Chain Check-In</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">&#128293;</span>
+        <div>
+          <h1>Agent Streak</h1>
+          <p class="tagline">Daily on-chain check-in for Agent ID holders</p>
+        </div>
+      </div>
+      <div class="wallet-area">
+        <button id="connectBtn" class="btn btn-primary" type="button">Connect Wallet</button>
+        <p id="walletAddress" class="wallet-address hidden" aria-live="polite"></p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="globalNotice" class="notice hidden" role="status"></div>
+
+    <section class="card network-card" aria-labelledby="networkTitle">
+      <div class="network-row">
+        <div>
+          <h2 id="networkTitle">Network</h2>
+          <p class="muted">Agent Streak runs on BSC. Pick a network — your wallet will be asked to switch.</p>
+          <p class="muted">Current network: <strong id="currentNetwork">Not connected</strong></p>
+        </div>
+        <div class="network-buttons" role="group" aria-label="Choose network">
+          <button id="switchMainnetBtn" class="btn btn-outline" type="button">BSC Mainnet</button>
+          <button id="switchTestnetBtn" class="btn btn-outline" type="button">BSC Testnet</button>
+        </div>
+      </div>
+      <p id="contractNotice" class="notice-inline hidden"></p>
+    </section>
+
+    <section class="grid">
+      <article class="card" aria-labelledby="agentIdTitle">
+        <h2 id="agentIdTitle">Your Agent ID</h2>
+        <p id="agentIdStatus" class="status-text">Connect your wallet to check whether you hold an Agent ID.</p>
+        <p id="agentIdDetail" class="muted"></p>
+        <p class="muted small">No Agent ID yet? <a id="claimLink" href="https://www.binance.com/en/wallet-direct" target="_blank" rel="noopener noreferrer">Claim an Agent ID in the wallet app</a> (opens in a new tab).</p>
+      </article>
+
+      <article class="card" aria-labelledby="streakTitle">
+        <h2 id="streakTitle">Your Streak</h2>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value" id="currentStreak">—</span>
+            <span class="stat-label">Current streak (days)</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="longestStreak">—</span>
+            <span class="stat-label">Longest streak (days)</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="totalCheckIns">—</span>
+            <span class="stat-label">Total check-ins</span>
+          </div>
+        </div>
+        <p id="todayStatus" class="status-text">—</p>
+        <button id="checkInBtn" class="btn btn-primary btn-large" type="button" disabled>Check In Today</button>
+        <p id="checkInHint" class="muted small">Connect your wallet to check in. You need an Agent ID, and you can only check in once per day (UTC).</p>
+        <div id="txStatus" class="tx-status hidden" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section class="card" aria-labelledby="leaderboardTitle">
+      <div class="section-head">
+        <div>
+          <h2 id="leaderboardTitle">Leaderboard</h2>
+          <p class="muted">Top 20 addresses by total check-ins. Ranked by total check-ins, then by current streak.</p>
+        </div>
+        <button id="refreshLeaderboardBtn" class="btn btn-outline" type="button">Refresh</button>
+      </div>
+      <p id="leaderboardStatus" class="muted" aria-live="polite">Loading leaderboard…</p>
+      <div class="table-wrap">
+        <table id="leaderboardTable" class="hidden">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Address</th>
+              <th scope="col">Total check-ins</th>
+              <th scope="col">Current streak</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+      <p class="muted small">Leaderboard data is read from on-chain <code>CheckedIn</code> events, most recent activity first. It may take a few seconds to load.</p>
+    </section>
+
+    <section class="card" aria-labelledby="howTitle">
+      <h2 id="howTitle">How it works</h2>
+      <ol class="how-list">
+        <li><strong>Connect your wallet</strong> — use the injected wallet in your browser (for example the wallet extension). There is no QR login, no server account, and never enter a seed phrase or private key anywhere on this page.</li>
+        <li><strong>Hold an Agent ID</strong> — only addresses that hold an Agent ID can check in. The app checks this on-chain, in your browser.</li>
+        <li><strong>Check in once a day</strong> — one check-in per UTC day. Come back tomorrow to keep your streak alive. Miss a day and your current streak resets.</li>
+        <li><strong>Climb the leaderboard</strong> — every check-in is an on-chain event, so streaks and rankings are public and verifiable.</li>
+      </ol>
+      <h3>Please note</h3>
+      <ul class="notes-list">
+        <li>Checking in is free — there is no fee charged by Agent Streak itself. You only pay the network gas for the transaction.</li>
+        <li>No return or income is promised. A streak is a record of participation, not an investment.</li>
+        <li>The smart contract is open-source. Verify it on the block explorer before interacting with it.</li>
+        <li>This page collects no sensitive data: no seed phrases, private keys, passwords, or personal information. Your wallet address is only used to read your on-chain streak.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="muted small">Agent Streak — a free daily check-in for Agent ID holders. Mainnet contract: <code>0xeacDD1D05354e70E16C00f6cb927c1463baC67E5</code> (BSC, verified on Sourcify); see <code>app.js</code> (CONFIG at the top).</p>
+    </div>
+  </footer>
+</body>
+</html>
